@@ -10,14 +10,14 @@ import Foundation
 public final class HostConnection {
     public let alias: String
     public let ssh: String
-    public let controlPath: String      // matches the config's ControlPath
+    public let controlPath: String      // matches the config's ControlPath (per-alias via %n)
     public let askpassPath: String?
     public let configFile: String?
 
     public init(
         alias: String,
         ssh: String = "/usr/bin/ssh",
-        controlPath: String = "~/.ssh/cm-%C",
+        controlPath: String = "~/.ssh/cm-%n",
         askpassPath: String? = nil,
         configFile: String? = nil
     ) {
