@@ -13,6 +13,12 @@ func usage() -> Never {
 
 // tunnelctl [-F/--config FILE] <command> <alias>
 var rest = Array(CommandLine.arguments.dropFirst())
+
+if let cmd = rest.first, cmd == "--version" || cmd == "-v" || cmd == "version" {
+    print("tunnelctl \(AppVersion.string)")
+    exit(0)
+}
+
 var configFile: String? = nil
 if let flag = rest.first, flag == "-F" || flag == "--config" {
     guard rest.count >= 2 else { usage() }

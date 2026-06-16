@@ -7,6 +7,18 @@ with **no per-app state**: your ssh config is the complete source of truth.
 See [DESIGN.md](DESIGN.md) for the reasoning behind the model (especially *why the
 unit of control is the host*).
 
+## Download
+
+[![Latest release](https://img.shields.io/github/v/release/kamysh/ssh-tunnel)](https://github.com/kamysh/ssh-tunnel/releases/latest)
+
+Grab the latest universal (Apple Silicon + Intel) `.dmg` from the
+[**Releases**](https://github.com/kamysh/ssh-tunnel/releases/latest) page, open it,
+and drag **Tunnels.app** to Applications. Each `v*` tag builds and publishes a DMG
+automatically (see `.github/workflows/release.yml`).
+
+The build is ad-hoc signed for now, so on first launch right-click the app →
+**Open** (or `xattr -dr com.apple.quarantine /Applications/Tunnels.app`).
+
 ## Model in one paragraph
 
 A "tunnel" is a **host** plus the forwards declared for it in ssh config. The app

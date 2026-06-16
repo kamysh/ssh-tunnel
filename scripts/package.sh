@@ -6,8 +6,10 @@ cd "$(dirname "$0")/.."
 APP_DISPLAY="Tunnels"
 EXEC="TunnelsApp"
 BUNDLE_ID="org.kamysh.tunnels"
-VERSION="0.1.0"
-BUILD="1"
+# Version: single source of truth is AppVersion in TunnelKit. Build number is the
+# git commit count (monotonic), falling back to 1 outside a git checkout.
+VERSION="$(grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' Sources/TunnelKit/Version.swift | head -1 | tr -d '"')"
+BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 ARCHS=(--arch arm64 --arch x86_64)
 
 echo ">> building universal release…"

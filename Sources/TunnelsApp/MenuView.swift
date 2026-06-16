@@ -1,4 +1,5 @@
 import SwiftUI
+import TunnelKit
 
 struct MenuView: View {
     @ObservedObject var model: TunnelsModel
@@ -26,6 +27,7 @@ struct MenuView: View {
                 Button("Reload") { model.refresh() }
                 Button("Open Config") { model.openConfig() }
                 Spacer()
+                Text("v\(AppVersion.string)").font(.caption2).foregroundStyle(.secondary)
                 Button("Quit") { NSApp.terminate(nil) }
             }
         }

@@ -1,0 +1,48 @@
+name: Release
+
+# Build the universal .dmg and publish it as a GitHub Release whenever a
+# version tag (e.g. v0.1.0) is pushed.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write          # create releases / upload assets
+
+jobs:
+  dmg:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Check tag matches code version
+        run: |
+          code="v$(grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' Sources/TunnelKit/Version.swift | head -1 | tr -d '"')"
+          echo "code=$code  tag=$GITHUB_REF_NAME"
+          test "$code" = "$GITHUB_REF_NAME"
+
+      - name: Build universal .dmg
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/package.sh
+
+      - name: Publish release with the .dmg
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/notes.md <<'EOF'
+          macOS menu-bar SSH tunnel manager — universal (Apple Silicon + Intel).
+
+          **Install:** open `Tunnels.dmg` and drag **Tunnels.app** to Applications.
+
+          > Ad-hoc signed (not notarized). On first launch macOS Gatekeeper will
+          > warn — right-click the app → **Open**, or run
+          > `xattr -dr com.apple.quarantine /Applications/Tunnels.app`.
+          EOF
+          gh release create "$GITHUB_REF_NAME" dist/Tunnels.dmg \
+            --title "Tunnels $GITHUB_REF_NAME" \
+            --notes-file /tmp/notes.md
