@@ -93,3 +93,7 @@ There is intentionally **no per-forward on/off** — see DESIGN.md §"The decisi
   expand a host to show its forwards read-only, like STM).
 - Reconnect-on-drop / wake-from-sleep policy.
 - Import the other STM hosts (host-a, host-b, …) into the config.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
