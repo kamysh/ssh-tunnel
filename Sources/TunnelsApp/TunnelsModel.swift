@@ -67,13 +67,24 @@ final class TunnelsModel: ObservableObject {
         let connect = !host.connected
         work.async { [weak self] in
             let conn = HostConnection(alias: alias, askpassPath: ask, configFile: cfg)
+            var failure: String? = nil
             do {
-                _ = connect ? try conn.connect() : try conn.disconnect()
+                // A failed ssh returns a non-zero result (it does NOT throw), so we
+                // must check .ok and surface stderr — otherwise failures are silent.
+                let r = connect ? try conn.connect() : try conn.disconnect()
+                if !r.ok {
+                    let msg = r.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    failure = "\(connect ? "Connect" : "Disconnect") \(alias) failed: "
+                        + (msg.isEmpty ? "ssh exit \(r.status)" : msg)
+                }
             } catch {
-                DispatchQueue.main.async { self?.lastError = "\(error)" }
+                failure = "\(alias): \(error)"
             }
             let states = TunnelsModel.scan(hostListFile: file, sshConfigFile: cfg)
-            DispatchQueue.main.async { self?.hosts = states }
+            DispatchQueue.main.async {
+                self?.lastError = failure       // nil on success → clears any prior error
+                self?.hosts = states
+            }
         }
     }
 

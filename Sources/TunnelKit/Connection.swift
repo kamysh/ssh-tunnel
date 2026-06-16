@@ -59,6 +59,7 @@ public final class HostConnection {
             "-M", "-N", "-f",
             "-o", "ControlMaster=yes",
             "-o", "ExitOnForwardFailure=yes",
+            "-o", "ConnectTimeout=10",
             "-o", "ControlPersist=\(persist)",
             "-o", "ServerAliveInterval=15",
             alias,
