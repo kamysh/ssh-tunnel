@@ -50,20 +50,34 @@ Binaries land in `.build/debug/`. `tunnelctl` finds `tunnels-askpass` as a sibli
 
 Real ssh directives in `~/.ssh/config` (or an `Include`d file). Forwards are
 genuine `LocalForward`/`RemoteForward`/`DynamicForward` directives, so a plain
-`ssh <host>` tunnels exactly as the app does:
+`ssh <host>` tunnels exactly as the app does.
+
+Group a host's forwards into **independently-togglable units**: one alias per
+group, with the shared connection settings written **once** in a `Host <host>*`
+wildcard block. Use `%n` (the alias) — not `%C` — in `ControlPath`, so each group
+gets its own connection (`%C` hashes host/user/port, which are identical across
+the aliases, and would collapse them onto one socket):
 
 ```
-Host myhost
-    HostName myhost
+Host myhost-vnc
+    LocalForward 5901 localhost:5900
+
+Host myhost-dev
+    LocalForward 3000 localhost:3000
+    LocalForward 3001 localhost:3001
+
+Host myhost*                         # shared settings — written once
+    HostName myhost.example.com
     User alice
     IdentityFile ~/.ssh/id_ed25519
     ControlMaster auto
-    ControlPath ~/.ssh/cm-%C        # %C is hashed → stays under macOS's ~104-char limit
+    ControlPath ~/.ssh/cm-%n         # %n = alias → a separate connection per group
     ControlPersist 10m
-    LocalForward 5901 localhost:5900
-    LocalForward 3000 localhost:3000
-    LocalForward 3389 localhost:3389
 ```
+
+The app lists each concrete alias (`myhost-vnc`, `myhost-dev`) as its own
+on/off row; the `myhost*` wildcard is settings-only and isn't shown. A plain
+`ssh myhost` matches the wildcard too — clean shell, no forwards.
 
 ## Usage
 
